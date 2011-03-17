@@ -45,5 +45,17 @@ public class BalloonRunnerTest {
             Assert.assertEquals(0, exitValue);
         }
     }
+    
+    @Test
+    public void convertBentWedgeFiles() throws IOException {
+        String dir = "data";
+        String[] filenames = { "NDNU_bent_down", "NUND_bent_down" };
+        for (String filename : filenames) {
+            String inputPath = dir + "/" + filename + ".mol";
+            String outputPath = dir + "/" + filename + "_3D.mol";
+            int exitValue = BalloonRunner.run(inputPath, outputPath);
+            Assert.assertEquals(0, exitValue);
+        }
+    }
 
 }
