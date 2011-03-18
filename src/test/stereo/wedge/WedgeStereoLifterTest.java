@@ -26,5 +26,16 @@ public class WedgeStereoLifterTest extends BaseTest {
         CIP_CHIRALITY assignment = CIPTool.getCIPChirality(atomContainer, element);
         System.out.println(assignment);
     }
+    
+    @Test
+    public void tetraSTest() {
+        IBond.Stereo[] stereos = { NONE, UP, DOWN, NONE };
+        IAtomContainer atomContainer = getTetra(Shape.CROSS, stereos);
+        WedgeStereoLifter lifter = new WedgeStereoLifter();
+        ITetrahedralChirality element = (ITetrahedralChirality) 
+                lifter.lift(atomContainer.getAtom(0), atomContainer);
+        CIP_CHIRALITY assignment = CIPTool.getCIPChirality(atomContainer, element);
+        System.out.println(assignment);
+    }
 
 }
