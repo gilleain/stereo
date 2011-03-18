@@ -15,7 +15,9 @@ public abstract class WedgeRule {
         int matchIndex = 0;
         while (matchIndex < stereoList.length) {
             IBond.Stereo patternStereo;
-            if (patternIndex < pattern.length) {
+            if (patternIndex == (2 * pattern.length) - 1) {
+                return false;
+            } else if (patternIndex < pattern.length) {
                 patternStereo = pattern[patternIndex];
             } else {
                 patternStereo = pattern[patternIndex - pattern.length];

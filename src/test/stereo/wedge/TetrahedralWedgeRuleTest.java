@@ -19,5 +19,12 @@ public class TetrahedralWedgeRuleTest {
         TetrahedralWedgeRule rule = new TetrahedralWedgeRule();
         Assert.assertTrue(rule.matches(instance));
     }
+    
+    @Test
+    public void misMatchTest() {
+        IBond.Stereo[] instance = { NONE, UP, UP, NONE };
+        TetrahedralWedgeRule rule = new TetrahedralWedgeRule();
+        Assert.assertFalse(rule.matches(instance));
+    }
 
 }
