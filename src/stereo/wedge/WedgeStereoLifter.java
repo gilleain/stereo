@@ -24,7 +24,7 @@ public class WedgeStereoLifter {
     
     public WedgeStereoLifter() {
         rules = new ArrayList<WedgeRule>();
-        rules.add(new TetrahedralWedgeRule());
+        rules.add(new CWTetrahedralWedgeRule());
     }
     
     private WedgeRule getRule(IBond.Stereo[] stereos) {

@@ -7,21 +7,11 @@ import java.util.SortedMap;
 import org.openscience.cdk.interfaces.IAtom;
 import org.openscience.cdk.interfaces.IBond;
 import org.openscience.cdk.interfaces.IStereoElement;
-import org.openscience.cdk.interfaces.ITetrahedralChirality.Stereo;
+import org.openscience.cdk.interfaces.ITetrahedralChirality;
 import org.openscience.cdk.stereo.TetrahedralChirality;
 
-import static org.openscience.cdk.interfaces.IBond.Stereo.UP;
-import static org.openscience.cdk.interfaces.IBond.Stereo.DOWN;
-import static org.openscience.cdk.interfaces.IBond.Stereo.NONE;;
-
-public class TetrahedralWedgeRule extends WedgeRule {
+public abstract class AbstractTetrahedralWedgeRule extends WedgeRule {
     
-    private IBond.Stereo[] pattern = { UP, DOWN, NONE, NONE };
-    
-    public IBond.Stereo[] getPattern() {
-        return pattern;
-    }
-
     @Override
     public IStereoElement execute(
             IAtom centralAtom, SortedMap<Double, IBond> angleMap) {
@@ -32,7 +22,9 @@ public class TetrahedralWedgeRule extends WedgeRule {
             IBond bond = bonds.get(permutation[index]);
             ligandAtoms[index] = bond.getConnectedAtom(centralAtom);
         }
-        return new TetrahedralChirality(centralAtom, ligandAtoms, Stereo.CLOCKWISE);
+        return new TetrahedralChirality(centralAtom, ligandAtoms, getStereo());
     }
+    
+    public abstract ITetrahedralChirality.Stereo getStereo();
 
 }
