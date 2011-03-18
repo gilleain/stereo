@@ -10,6 +10,7 @@ import javax.vecmath.Point2d;
 import org.openscience.cdk.interfaces.IAtom;
 import org.openscience.cdk.interfaces.IAtomContainer;
 import org.openscience.cdk.interfaces.IBond;
+import org.openscience.cdk.interfaces.IStereoElement;
 
 /**
  * 'Lifts' the 2D wedge stereo representation into a 3D one.
@@ -33,7 +34,7 @@ public class WedgeStereoLifter {
         return null;
     }
     
-    public void lift(IAtom atom, IAtomContainer atomContainer) {
+    public IStereoElement lift(IAtom atom, IAtomContainer atomContainer) {
         List<IBond> bonds = atomContainer.getConnectedBondsList(atom);
         
         // it doesn't matter which atom is picked as the reference
@@ -47,7 +48,8 @@ public class WedgeStereoLifter {
         for (int index = 1; index < bonds.size(); index++) {
             IBond bond = bonds.get(index);
             IAtom bondAtom = bond.getConnectedAtom(atom);
-            angleMap.put(getFullAngle(atom, reference, bondAtom), bond);
+            double angle = getFullAngle(atom, reference, bondAtom); 
+            angleMap.put((2 * Math.PI) - angle, bond);
         }
         
         // now, sort the bonds by these angles and get the IBond.Stereo array
@@ -61,7 +63,9 @@ public class WedgeStereoLifter {
         
         WedgeRule rule = getRule(stereos);
         if (rule != null) {
-            rule.execute(atom, angleMap);
+            return rule.execute(atom, angleMap);
+        } else {
+            return null;
         }
     }
     
