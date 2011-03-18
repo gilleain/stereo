@@ -21,7 +21,7 @@ import org.openscience.cdk.interfaces.IMolecule;
 import org.openscience.cdk.io.MDLV2000Writer;
 import org.openscience.cdk.tools.periodictable.PeriodicTable;
 
-import stereo.WedgeStereoComparisonTool;
+import stereo.wedge.WedgeStereoComparisonTool;
 
 public class WedgeStereoComparisonToolTest extends BaseTest {
     
