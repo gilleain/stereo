@@ -1,5 +1,7 @@
 package test.stereo.wedge;
 
+import java.util.Arrays;
+
 import junit.framework.Assert;
 
 import org.junit.Test;
@@ -25,6 +27,15 @@ public class TetrahedralWedgeRuleTest {
         IBond.Stereo[] instance = { NONE, UP, UP, NONE };
         TetrahedralWedgeRule rule = new TetrahedralWedgeRule();
         Assert.assertFalse(rule.matches(instance));
+    }
+    
+    @Test
+    public void matchPermutationTest() {
+        IBond.Stereo[] instance = { NONE, NONE, UP, DOWN };
+        TetrahedralWedgeRule rule = new TetrahedralWedgeRule();
+        rule.matches(instance);
+        int[] permutation = rule.getMatchPermutation();
+        System.out.println(Arrays.toString(permutation));
     }
 
 }
