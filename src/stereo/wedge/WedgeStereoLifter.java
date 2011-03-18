@@ -1,10 +1,9 @@
 package stereo.wedge;
 
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
+import java.util.SortedMap;
+import java.util.TreeMap;
 
 import javax.vecmath.Point2d;
 
@@ -20,21 +19,16 @@ import org.openscience.cdk.interfaces.IBond;
  */
 public class WedgeStereoLifter {
     
-    private Map<String, WedgeRule> ruleMap;
+    private List<WedgeRule> rules;
     
     public WedgeStereoLifter() {
-        ruleMap = new HashMap<String, WedgeRule>();
-        addRule("UDNN", new TetrahedralWedgeRule());
+        rules = new ArrayList<WedgeRule>();
+        rules.add(new TetrahedralWedgeRule());
     }
     
-    private void addRule(String pattern, WedgeRule rule) {
-        // patterns are doubled to match circular permutations
-        ruleMap.put(pattern + pattern, rule);
-    }
-    
-    private WedgeRule getRule(String pattern) {
-        for (String key : ruleMap.keySet()) {
-            if (key.contains(pattern)) return ruleMap.get(key);
+    private WedgeRule getRule(IBond.Stereo[] stereos) {
+        for (WedgeRule rule : rules) {
+            if (rule.matches(stereos)) return rule;
         }
         return null;
     }
@@ -48,7 +42,7 @@ public class WedgeStereoLifter {
         IAtom reference = referenceBond.getConnectedAtom(atom);
         
         // calculate the full angle between the reference bond and the others
-        Map<Double, IBond> angleMap = new HashMap<Double, IBond>();
+        SortedMap<Double, IBond> angleMap = new TreeMap<Double, IBond>();
         angleMap.put(0.0, referenceBond);
         for (int index = 1; index < bonds.size(); index++) {
             IBond bond = bonds.get(index);
@@ -56,24 +50,19 @@ public class WedgeStereoLifter {
             angleMap.put(getFullAngle(atom, reference, bondAtom), bond);
         }
         
-        // now, sort the bonds by these angles and get the IBond.Stereo string
-        List<Double> angles = new ArrayList<Double>(angleMap.keySet());
-        Collections.sort(angles);
-        Collections.reverse(angles);
-        String stereoString = "";
-        for (Double angle : angles) {
+        // now, sort the bonds by these angles and get the IBond.Stereo array
+        IBond.Stereo[] stereos = new IBond.Stereo[bonds.size()];
+        int i = 0;
+        for (Double angle : angleMap.keySet()) {
             IBond bond = angleMap.get(angle);
-            IBond.Stereo stereo = bond.getStereo();
-            switch (stereo) {
-                case UP: stereoString += "U"; break;
-                case DOWN: stereoString += "D"; break;
-                case NONE: 
-                default: stereoString += "N";
-            }
+            stereos[i] = bond.getStereo();
+            i++;
         }
         
-        WedgeRule rule = getRule(stereoString);
-        rule.execute(atom, angleMap);
+        WedgeRule rule = getRule(stereos);
+        if (rule != null) {
+            rule.execute(atom, angleMap);
+        }
     }
     
     /**

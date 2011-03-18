@@ -4,70 +4,20 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 
-import javax.vecmath.Point2d;
-
-import junit.framework.Assert;
 
 import org.junit.Test;
-import org.openscience.cdk.Atom;
-import org.openscience.cdk.AtomContainer;
 import org.openscience.cdk.exception.CDKException;
 import org.openscience.cdk.geometry.cip.CIPTool.CIP_CHIRALITY;
-import org.openscience.cdk.interfaces.IAtom;
 import org.openscience.cdk.interfaces.IAtomContainer;
-import org.openscience.cdk.interfaces.IBond;
 import org.openscience.cdk.interfaces.IBond.Stereo;
 import org.openscience.cdk.interfaces.IMolecule;
 import org.openscience.cdk.io.MDLV2000Writer;
-import org.openscience.cdk.tools.periodictable.PeriodicTable;
 
 import stereo.wedge.WedgeStereoComparisonTool;
 
 public class WedgeStereoComparisonToolTest extends BaseTest {
     
-    public enum Shape { CROSS, BENT_DOWN, BENT_UP }
-    
-    private void crossShape(IAtomContainer tetra) {
-        tetra.addAtom(new Atom("C",  new Point2d( 0,  0)));
-        tetra.addAtom(new Atom("F",  new Point2d( 1,  0)));
-        tetra.addAtom(new Atom("Cl", new Point2d( 0, -1)));
-        tetra.addAtom(new Atom("Br", new Point2d(-1,  0)));
-        tetra.addAtom(new Atom("I",  new Point2d( 0,  1)));
-    }
-    
-    private void bentDownShape(IAtomContainer tetra) {
-        tetra.addAtom(new Atom("C",  new Point2d( 0,   0)));
-        tetra.addAtom(new Atom("F",  new Point2d( 1, 0.5)));
-        tetra.addAtom(new Atom("Cl", new Point2d( 0,  -1)));
-        tetra.addAtom(new Atom("Br", new Point2d(-1, 0.5)));
-        tetra.addAtom(new Atom("I",  new Point2d( 0,   1)));
-    }
-    
-    private IAtomContainer getTetra(Shape shape, Stereo... stereos) {
-        IAtomContainer tetra = new AtomContainer();
-        if (shape == Shape.CROSS) {
-            crossShape(tetra);
-        } else if (shape == Shape.BENT_DOWN) {
-            bentDownShape(tetra);
-        }
-        for (int i = 1; i < 5; i++) {
-            tetra.addBond(0, i, IBond.Order.SINGLE);
-        }
-        for (IAtom atom : tetra.atoms()) {
-            Integer atNumber = PeriodicTable.getAtomicNumber(atom.getSymbol());
-            if (atNumber == null) { 
-                System.err.println("Null atNumber " + atom.getSymbol());
-            }
-            atom.setAtomicNumber(atNumber);
-        }
-        
-        Assert.assertEquals(4, stereos.length);
-        for (int index = 0; index < 4; index++) {
-            tetra.getBond(index).setStereo(stereos[index]);
-        }
-        
-        return tetra;
-    }
+  
     
     public void printMolFile(IAtomContainer atomContainer, String fileName) {
         File dir = new File("data");

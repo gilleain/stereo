@@ -1,9 +1,10 @@
 package stereo.wedge;
 
-import java.util.Map;
+import java.util.SortedMap;
 
 import org.openscience.cdk.interfaces.IAtom;
 import org.openscience.cdk.interfaces.IBond;
+import org.openscience.cdk.interfaces.IStereoElement;
 
 public abstract class WedgeRule {
     
@@ -78,7 +79,7 @@ public abstract class WedgeRule {
     
     public abstract IBond.Stereo[] getPattern();
     
-    public abstract void execute(
-            IAtom centralAtom, Map<Double, IBond> angleMap);
+    public abstract IStereoElement execute(
+            IAtom centralAtom, SortedMap<Double, IBond> angleMap);
 
 }
