@@ -10,6 +10,7 @@ import org.openscience.cdk.geometry.cip.CIPTool;
 import org.openscience.cdk.geometry.cip.CIPTool.CIP_CHIRALITY;
 import org.openscience.cdk.interfaces.IAtomContainer;
 import org.openscience.cdk.interfaces.IBond;
+import org.openscience.cdk.interfaces.IMolecule;
 import org.openscience.cdk.interfaces.ITetrahedralChirality;
 
 import stereo.wedge.WedgeStereoLifter;
@@ -60,6 +61,13 @@ public class WedgeStereoLifterTest extends BaseTest {
                 lifter.lift(atomContainer.getAtom(0), atomContainer);
         CIP_CHIRALITY assignment = CIPTool.getCIPChirality(atomContainer, element);
         Assert.assertEquals(CIP_CHIRALITY.R, assignment);
+    }
+    
+    public IMolecule from3DToWedgeModel(IMolecule threeDMol, int stereoAtom,
+            int leftPlanarAtom, int rightPlanarAtom) {
+        
+        
+        return null;
     }
 
 }

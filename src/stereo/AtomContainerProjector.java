@@ -1,8 +1,9 @@
 package stereo;
 
-import javax.vecmath.Point2d;
-import javax.vecmath.Vector2d;
+import javax.vecmath.Point3d;
+import javax.vecmath.Vector3d;
 
+import org.openscience.cdk.interfaces.IAtom;
 import org.openscience.cdk.interfaces.IAtomContainer;
 
 /**
@@ -13,22 +14,15 @@ import org.openscience.cdk.interfaces.IAtomContainer;
  */
 public class AtomContainerProjector {
     
-    private static class Plane {
-        
-        public Point2d point;
-        
-        public Vector2d normal;
-        
-        public Plane(Point2d point, Vector2d normal) {
-            this.point = point;
-            this.normal = normal;
-        }
-        
-    }
-    
     public static void project(
-            IAtomContainer atomContainer, Point2d point, Vector2d normal) {
-        Plane plane = new Plane(point, normal);
+            IAtomContainer atomContainer, Point3d planePoint, Vector3d planeNormal) {
+        Plane plane = new Plane(planePoint, planeNormal);
+        for (IAtom atom : atomContainer.atoms()) {
+            Point3d point = atom.getPoint3d();
+            if (point != null) {
+                atom.setPoint2d(plane.project(point));
+            }
+        }
     }
 
 }
