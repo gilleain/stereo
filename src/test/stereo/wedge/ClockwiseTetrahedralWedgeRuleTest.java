@@ -40,11 +40,14 @@ public class ClockwiseTetrahedralWedgeRuleTest extends BaseTest {
     
     @Test
     public void matchPermutationTest() {
-        IBond.Stereo[] instance = { NONE, NONE, UP, DOWN };
+        IBond.Stereo[] instance = { NONE, UP, DOWN, NONE };
         CWTetrahedralWedgeRule rule = new CWTetrahedralWedgeRule();
         rule.matches(instance);
-        int[] permutation = rule.getMatchPermutation();
-        System.out.println(Arrays.toString(permutation));
+        int[] expected = new int[] {1, 2, 3, 0};
+        int[] actual = rule.getMatchPermutation();
+        String error = String.format("expected : %s got %s",
+                Arrays.toString(expected), Arrays.toString(actual));
+        Assert.assertTrue(error, arrayEquals(expected, actual));
     }
     
     @Test

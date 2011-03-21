@@ -43,8 +43,11 @@ public class AntiClockwiseTetrahedralWedgeRuleTest extends BaseTest {
         IBond.Stereo[] instance = { NONE, NONE, DOWN, UP };
         ACWTetrahedralWedgeRule rule = new ACWTetrahedralWedgeRule();
         rule.matches(instance);
-        int[] permutation = rule.getMatchPermutation();
-        System.out.println(Arrays.toString(permutation));
+        int[] expected = new int[] {2, 3, 0, 1};
+        int[] actual = rule.getMatchPermutation();
+        String error = String.format("expected : %s got %s",
+                Arrays.toString(expected), Arrays.toString(actual));
+        Assert.assertTrue(error, arrayEquals(expected, actual));
     }
     
     @Test

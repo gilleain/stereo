@@ -42,6 +42,18 @@ public class BaseTest {
 
     private final int w = 200;
     private final int h = 200;
+    
+    public boolean arrayEquals(int[] expected, int[] actual) {
+        if (expected.length != actual.length) return false;
+        for (int i = 0; i < expected.length; i++) {
+            if (expected[i] == actual[i]) {
+                continue;
+            } else {
+                return false;
+            }
+        }
+        return true;
+    }
 
     public IMolecule getMolecule(String filename) throws FileNotFoundException, CDKException {
         MDLV2000Reader reader = new MDLV2000Reader(new FileReader(filename));
@@ -66,8 +78,33 @@ public class BaseTest {
     }
 
     public enum Shape { CROSS, BENT_DOWN, BENT_UP }
+    
+    public IAtomContainer getTriangle(Shape shape, Stereo... stereos) {
+        IAtomContainer tri = new AtomContainer();
+        if (shape == Shape.BENT_UP) {
+            tri.addAtom(new Atom("C",  new Point2d( 0,  0)));
+            tri.addAtom(new Atom("F",  new Point2d( 0,  1)));
+            tri.addAtom(new Atom("Cl", new Point2d( 1, -1)));
+            tri.addAtom(new Atom("Br", new Point2d(-1, -1)));
+        } else {
+            tri.addAtom(new Atom("C",  new Point2d( 0,  0)));
+            tri.addAtom(new Atom("F",  new Point2d( 0, -1)));
+            tri.addAtom(new Atom("Cl", new Point2d( 1,  1)));
+            tri.addAtom(new Atom("Br", new Point2d(-1,  1)));
+        }
+        for (int i = 1; i < 4; i++) {
+            tri.addBond(0, i, IBond.Order.SINGLE);
+        }
+        setAtomNumber(tri);
+        Assert.assertEquals(3, stereos.length);
+        for (int index = 0; index < 3; index++) {
+            tri.getBond(index).setStereo(stereos[index]);
+        }
+        
+        return tri;
+    }
 
-    public  void crossShape(IAtomContainer tetra) {
+    public void crossShape(IAtomContainer tetra) {
         tetra.addAtom(new Atom("C",  new Point2d( 0,  0)));
         tetra.addAtom(new Atom("F",  new Point2d( 1,  0)));
         tetra.addAtom(new Atom("Cl", new Point2d( 0, -1)));
@@ -93,13 +130,7 @@ public class BaseTest {
         for (int i = 1; i < 5; i++) {
             tetra.addBond(0, i, IBond.Order.SINGLE);
         }
-        for (IAtom atom : tetra.atoms()) {
-            Integer atNumber = PeriodicTable.getAtomicNumber(atom.getSymbol());
-            if (atNumber == null) { 
-                System.err.println("Null atNumber " + atom.getSymbol());
-            }
-            atom.setAtomicNumber(atNumber);
-        }
+        setAtomNumber(tetra);
 
         Assert.assertEquals(4, stereos.length);
         for (int index = 0; index < 4; index++) {
@@ -107,6 +138,16 @@ public class BaseTest {
         }
 
         return tetra;
+    }
+    
+    public void setAtomNumber(IAtomContainer atomContainer) {
+        for (IAtom atom : atomContainer.atoms()) {
+            Integer atNumber = PeriodicTable.getAtomicNumber(atom.getSymbol());
+            if (atNumber == null) { 
+                System.err.println("Null atNumber " + atom.getSymbol());
+            }
+            atom.setAtomicNumber(atNumber);
+        }
     }
 
 }
