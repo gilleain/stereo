@@ -61,7 +61,8 @@ public class AntiClockwiseTetrahedralWedgeRuleTest extends BaseTest {
         ACWTetrahedralWedgeRule rule = new ACWTetrahedralWedgeRule();
         rule.matches(stereos);
         ITetrahedralChirality element = 
-            (ITetrahedralChirality) rule.execute(centralAtom, angleMap);
+            (ITetrahedralChirality) rule.execute(
+                centralAtom, atomContainer, angleMap);
         CIP_CHIRALITY chiral = CIPTool.getCIPChirality(atomContainer, element);
         Assert.assertEquals(CIP_CHIRALITY.S, chiral);
     }
@@ -80,7 +81,8 @@ public class AntiClockwiseTetrahedralWedgeRuleTest extends BaseTest {
         ACWTetrahedralWedgeRule rule = new ACWTetrahedralWedgeRule();
         rule.matches(stereos);
         ITetrahedralChirality element = 
-            (ITetrahedralChirality) rule.execute(centralAtom, angleMap);
+            (ITetrahedralChirality) rule.execute(
+                    centralAtom, atomContainer, angleMap);
         CIP_CHIRALITY chiral = CIPTool.getCIPChirality(atomContainer, element);
         Assert.assertEquals(CIP_CHIRALITY.R, chiral);
     }

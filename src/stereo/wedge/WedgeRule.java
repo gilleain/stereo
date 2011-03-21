@@ -3,6 +3,7 @@ package stereo.wedge;
 import java.util.SortedMap;
 
 import org.openscience.cdk.interfaces.IAtom;
+import org.openscience.cdk.interfaces.IAtomContainer;
 import org.openscience.cdk.interfaces.IBond;
 import org.openscience.cdk.interfaces.IStereoElement;
 
@@ -45,34 +46,45 @@ public abstract class WedgeRule {
     public boolean matches(IBond.Stereo[] stereoList) {
         IBond.Stereo[] pattern = getPattern();
         if (stereoList.length != pattern.length) return false;
+        int length = pattern.length;
         
         int patternIndex = 0;
         int matchIndex = 0;
         
         // reset the match point
         matchPoint = -1;
-        while (matchIndex < stereoList.length) {
-            IBond.Stereo patternStereo;
+        while (patternIndex < length && matchIndex < 2 * length) {
+            IBond.Stereo patternStereo = pattern[patternIndex];
+            IBond.Stereo matchStereo;
             
             // XXX could fail faster here : pI - l > l?
-            if (patternIndex == (2 * pattern.length) - 1) {
-                return false;
-            } else if (patternIndex < pattern.length) {
-                patternStereo = pattern[patternIndex];
+            if (matchIndex < length) {
+                matchStereo = stereoList[matchIndex];
             } else {
-                patternStereo = pattern[patternIndex - pattern.length];
+                matchStereo = stereoList[matchIndex - length];
             }
             
-            if (patternStereo == stereoList[matchIndex]) {
+            if (patternStereo == matchStereo) {
                 patternIndex++;
                 matchIndex++;
             } else {
-                patternIndex++;
+                if (patternIndex == 0) {
+                    // look for a new start
+                    matchIndex++;
+                } else {
+                    // start again
+                    patternIndex = 0;
+                }
             }
         }
         
+        // less than a whole pattern was matched
+        if (patternIndex < pattern.length) {
+            return false;
+        }
+        
         // store the point where the match started
-        matchPoint = patternIndex - pattern.length;
+        matchPoint = matchIndex - length;
         
         return true;
     }
@@ -80,6 +92,8 @@ public abstract class WedgeRule {
     public abstract IBond.Stereo[] getPattern();
     
     public abstract IStereoElement execute(
-            IAtom centralAtom, SortedMap<Double, IBond> angleMap);
+            IAtom centralAtom, 
+            IAtomContainer atomContainer,
+            SortedMap<Double, IBond> angleMap);
 
 }

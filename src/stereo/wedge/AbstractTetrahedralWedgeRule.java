@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.SortedMap;
 
 import org.openscience.cdk.interfaces.IAtom;
+import org.openscience.cdk.interfaces.IAtomContainer;
 import org.openscience.cdk.interfaces.IBond;
 import org.openscience.cdk.interfaces.IStereoElement;
 import org.openscience.cdk.interfaces.ITetrahedralChirality;
@@ -13,8 +14,9 @@ import org.openscience.cdk.stereo.TetrahedralChirality;
 public abstract class AbstractTetrahedralWedgeRule extends WedgeRule {
     
     @Override
-    public IStereoElement execute(
-            IAtom centralAtom, SortedMap<Double, IBond> angleMap) {
+    public IStereoElement execute(IAtom centralAtom, 
+                                  IAtomContainer atomContainer, 
+                                  SortedMap<Double, IBond> angleMap) {
         int[] permutation = getMatchPermutation();
         List<IBond> bonds = new ArrayList<IBond>(angleMap.values());
         IAtom[] ligandAtoms = new IAtom[4];
