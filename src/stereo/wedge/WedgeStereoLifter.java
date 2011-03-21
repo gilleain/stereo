@@ -37,6 +37,7 @@ public class WedgeStereoLifter {
     
     public IStereoElement lift(IAtom atom, IAtomContainer atomContainer) {
         List<IBond> bonds = atomContainer.getConnectedBondsList(atom);
+        if (bonds.size() < 3) return null;
         
         // it doesn't matter which atom is picked as the reference
         // as the wedge pattern matching is circular
