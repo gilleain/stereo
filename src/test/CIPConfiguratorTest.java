@@ -18,7 +18,7 @@ public class CIPConfiguratorTest extends BaseTest {
 //        String[] filenames = {"NDNU", "NUDN", "NUND", "NUNU" };
         String[] filenames = {"NNDU", "NNUD", "NDUN", "NDND" };
         for (String filename : filenames) {
-            String path = "data/" + filename + "_3D.mol";
+            String path = "data/simples/" + filename + "_3D.mol";
             IMolecule mol = getMolecule(path);
             IAtom centralAtom = mol.getAtom(0);
             IAtom atom1 = mol.getAtom(1);

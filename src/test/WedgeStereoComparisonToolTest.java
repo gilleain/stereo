@@ -17,8 +17,6 @@ import stereo.wedge.WedgeStereoComparisonTool;
 
 public class WedgeStereoComparisonToolTest extends BaseTest {
     
-  
-    
     public void printMolFile(IAtomContainer atomContainer, String fileName) {
         File dir = new File("data");
         File fullPath = new File(dir, fileName + ".mol");
@@ -36,7 +34,7 @@ public class WedgeStereoComparisonToolTest extends BaseTest {
     public void makeBentImages() throws CDKException, IOException {
         String[] filenames = { "NDNU_bent_down", "NUND_bent_down" };
         for (String filename : filenames) {
-            String inputPath = "data/" + filename + ".mol";
+            String inputPath = "data/simples/" + filename + ".mol";
             IMolecule mol = getMolecule(inputPath);
             String outputPath = "img/" + filename + "_2D.png";
             draw(mol, outputPath);
@@ -48,7 +46,7 @@ public class WedgeStereoComparisonToolTest extends BaseTest {
         String[] filenames = {"NDNU", "NUDN", "NUND", "NUNU", 
                               "NNDU", "NNUD", "NDUN", "NDND" };
         for (String filename : filenames) {
-            String inputPath = "data/" + filename + ".mol";
+            String inputPath = "data/simples" + filename + ".mol";
             IMolecule mol = getMolecule(inputPath);
             String outputPath = "img/" + filename + "_2D.png";
             draw(mol, outputPath);
