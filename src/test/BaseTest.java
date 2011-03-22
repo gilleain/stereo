@@ -23,13 +23,16 @@ import junit.framework.Assert;
 import org.openscience.cdk.Atom;
 import org.openscience.cdk.AtomContainer;
 import org.openscience.cdk.Molecule;
+import org.openscience.cdk.Reaction;
 import org.openscience.cdk.exception.CDKException;
 import org.openscience.cdk.geometry.GeometryTools;
 import org.openscience.cdk.interfaces.IAtom;
 import org.openscience.cdk.interfaces.IAtomContainer;
 import org.openscience.cdk.interfaces.IBond;
 import org.openscience.cdk.interfaces.IMolecule;
+import org.openscience.cdk.interfaces.IReaction;
 import org.openscience.cdk.interfaces.IBond.Stereo;
+import org.openscience.cdk.io.MDLRXNReader;
 import org.openscience.cdk.io.MDLV2000Reader;
 import org.openscience.cdk.renderer.AtomContainerRenderer;
 import org.openscience.cdk.renderer.IRenderer;
@@ -63,6 +66,11 @@ public class BaseTest {
     public IMolecule getMolecule(String filename) throws FileNotFoundException, CDKException {
         MDLV2000Reader reader = new MDLV2000Reader(new FileReader(filename));
         return reader.read(new Molecule());
+    }
+    
+    public IReaction readReaction(String filePath) throws FileNotFoundException, CDKException {
+        MDLRXNReader reader = new MDLRXNReader(new FileReader(filePath));
+        return reader.read(new Reaction());
     }
     
     public void drawDirect(IMolecule molecule, String outputPath) throws IOException {
