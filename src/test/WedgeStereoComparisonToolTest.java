@@ -37,7 +37,7 @@ public class WedgeStereoComparisonToolTest extends BaseTest {
             String inputPath = "data/simples/" + filename + ".mol";
             IMolecule mol = getMolecule(inputPath);
             String outputPath = "img/" + filename + "_2D.png";
-            draw(mol, outputPath);
+            drawJCP(mol, outputPath);
         }
     }
     
@@ -49,7 +49,7 @@ public class WedgeStereoComparisonToolTest extends BaseTest {
             String inputPath = "data/simples" + filename + ".mol";
             IMolecule mol = getMolecule(inputPath);
             String outputPath = "img/" + filename + "_2D.png";
-            draw(mol, outputPath);
+            drawJCP(mol, outputPath);
         }
     }
     

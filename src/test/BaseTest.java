@@ -4,6 +4,8 @@ import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.Rectangle;
+import java.awt.RenderingHints;
+import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.awt.image.RenderedImage;
 import java.io.File;
@@ -22,6 +24,7 @@ import org.openscience.cdk.Atom;
 import org.openscience.cdk.AtomContainer;
 import org.openscience.cdk.Molecule;
 import org.openscience.cdk.exception.CDKException;
+import org.openscience.cdk.geometry.GeometryTools;
 import org.openscience.cdk.interfaces.IAtom;
 import org.openscience.cdk.interfaces.IAtomContainer;
 import org.openscience.cdk.interfaces.IBond;
@@ -37,11 +40,13 @@ import org.openscience.cdk.renderer.generators.BasicSceneGenerator;
 import org.openscience.cdk.renderer.generators.IGenerator;
 import org.openscience.cdk.renderer.visitor.AWTDrawVisitor;
 import org.openscience.cdk.tools.periodictable.PeriodicTable;
+import org.openscience.reactionblast.graphics.direct.DirectMoleculeDrawer;
+import org.openscience.reactionblast.graphics.direct.Params;
 
 public class BaseTest {
 
-    private final int w = 200;
-    private final int h = 200;
+    private final int w = 500;
+    private final int h = 500;
     
     public boolean arrayEquals(int[] expected, int[] actual) {
         if (expected.length != actual.length) return false;
@@ -59,13 +64,37 @@ public class BaseTest {
         MDLV2000Reader reader = new MDLV2000Reader(new FileReader(filename));
         return reader.read(new Molecule());
     }
+    
+    public void drawDirect(IMolecule molecule, String outputPath) throws IOException {
+        Params params = new Params();
+        params.bondLength = 40;
+        params.atomSymbolFontSize = 14;
+        double scale = GeometryTools.getScaleFactor(molecule, params.bondLength);
+        GeometryTools.scaleMolecule(molecule, scale);
+        for (IAtom atom : molecule.atoms()) {
+            Point2d p = atom.getPoint2d();
+            p.y *= -1;
+            atom.setPoint2d(p);
+        }
+        translateTo(molecule, w/ 2, h / 2);
+        DirectMoleculeDrawer drawer = new DirectMoleculeDrawer(params);
+        Image image = new BufferedImage(w, h, BufferedImage.TYPE_3BYTE_BGR);
+        Graphics2D graphics = (Graphics2D) image.getGraphics();
+        graphics.setRenderingHint(
+            RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+        graphics.setColor(Color.WHITE);
+        graphics.fillRect(0, 0, w, h);
+        graphics.setColor(Color.BLACK);
+        drawer.drawMolecule(molecule, graphics);
+        ImageIO.write((RenderedImage) image, "PNG", new File(outputPath));
+    }
 
-    public void draw(IMolecule molecule, String outputPath) throws IOException {
+    public void drawJCP(IMolecule molecule, String outputPath) throws IOException {
         List<IGenerator<IAtomContainer>> generators = 
             new ArrayList<IGenerator<IAtomContainer>>();
         generators.add(new BasicSceneGenerator());
-        generators.add(new BasicAtomGenerator());
         generators.add(new BasicBondGenerator());
+        generators.add(new BasicAtomGenerator());
         IRenderer<IAtomContainer> molrenderer = 
             new AtomContainerRenderer(generators, new AWTFontManager());
         molrenderer.setup(molecule, new Rectangle(w, h));
@@ -75,6 +104,17 @@ public class BaseTest {
         graphics.fillRect(0, 0, w, h);
         molrenderer.paint(molecule, new AWTDrawVisitor(graphics));
         ImageIO.write((RenderedImage) image, "PNG", new File(outputPath));
+    }
+    
+    public void translateTo(IAtomContainer ac, double x, double y) {
+        Rectangle2D bounds = GeometryTools.getRectangle2D(ac);
+        double dx = x - bounds.getCenterX();
+        double dy = y - bounds.getCenterY();
+        System.out.println("moving to " +x + " " + y + " by "+ dx + " " + dy);
+        for (IAtom atom : ac.atoms()) {
+            atom.getPoint2d().x += dx;
+            atom.getPoint2d().y += dy;
+        }
     }
 
     public enum Shape { CROSS, BENT_DOWN, BENT_UP }
