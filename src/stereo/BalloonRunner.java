@@ -28,12 +28,19 @@ public class BalloonRunner {
     }
     
     public static int run(String inputPath, String outputPath) throws IOException {
+        return run(inputPath, outputPath, false);
+    }
+    
+    public static int run(String inputPath, String outputPath, boolean addHydrogens) throws IOException {
         File outputFile = new File(outputPath);
         if (outputFile.exists()) {
             outputFile.delete();
         }
         List<String> commands = new ArrayList<String>();
         commands.add(String.format("%s/balloon", BALLOON_DIR));
+        if (addHydrogens) {
+            commands.add("-H");
+        }
         commands.add(inputPath);
         commands.add(outputPath);
         ProcessBuilder processBuilder = new ProcessBuilder(commands);
