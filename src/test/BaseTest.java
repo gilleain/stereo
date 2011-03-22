@@ -69,12 +69,16 @@ public class BaseTest {
         Params params = new Params();
         params.bondLength = 40;
         params.atomSymbolFontSize = 14;
+        params.drawAtomID = true;
         double scale = GeometryTools.getScaleFactor(molecule, params.bondLength);
         GeometryTools.scaleMolecule(molecule, scale);
+        int i = 0;
         for (IAtom atom : molecule.atoms()) {
             Point2d p = atom.getPoint2d();
             p.y *= -1;
             atom.setPoint2d(p);
+            atom.setID(String.valueOf(i));
+            i++;
         }
         translateTo(molecule, w/ 2, h / 2);
         DirectMoleculeDrawer drawer = new DirectMoleculeDrawer(params);
