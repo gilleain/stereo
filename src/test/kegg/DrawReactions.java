@@ -19,7 +19,7 @@ import test.BaseTest;
 public class DrawReactions extends BaseTest {
     
     private final int w = 800;
-    private final int h = 500;
+    private final int h = 400;
     
     public void drawReaction(IReaction reaction, String outputPath) throws IOException {
         Params params = new Params();
