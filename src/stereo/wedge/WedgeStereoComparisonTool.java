@@ -1,5 +1,6 @@
 package stereo.wedge;
 
+import java.util.HashMap;
 import java.util.Map;
 
 import org.openscience.cdk.geometry.cip.CIPTool;
@@ -11,7 +12,15 @@ import org.openscience.cdk.interfaces.ITetrahedralChirality;
 
 public class WedgeStereoComparisonTool {
     
-   
+    public enum ComparisonResult {
+        NEITHER_CHIRAL,
+        FIRST_NULL_SECOND_OK,
+        FIRST_OK_SECOND_NULL,
+        FIRST_NONE_SECOND_OK,
+        FIRST_OK_SECOND_NONE,
+        CHIRAL_MATCH,
+        CHIRAL_MISMATCH
+    }
     
     /**
      * Compare a (mapped) pair of atom containers to check that they have
@@ -22,9 +31,11 @@ public class WedgeStereoComparisonTool {
      * @param equivMap mapped atoms between the pair
      * @return
      */
-    public static boolean hasSameChiralities(
+    public static Map<Integer, ComparisonResult> hasSameChiralities(
             IAtomContainer atomContainerA, IAtomContainer atomContainerB,
-            Map<Integer, Integer> equivMap) throws StereoMatchException {
+            Map<Integer, Integer> equivMap) {
+        Map<Integer, ComparisonResult> resultMap = 
+            new HashMap<Integer, ComparisonResult>();
         
         WedgeStereoLifter lifter = new WedgeStereoLifter();
         for (int indexA = 0; indexA < atomContainerA.getAtomCount(); indexA++) {
@@ -34,35 +45,31 @@ public class WedgeStereoComparisonTool {
             IStereoElement elementA = lifter.lift(atomA, atomContainerA);
             IStereoElement elementB = lifter.lift(atomB, atomContainerB);
             if (elementA == null && elementB == null) {
-                continue;   // neither are stereo centers
+                resultMap.put(indexA, ComparisonResult.NEITHER_CHIRAL);
             } else if (elementA == null && elementB != null) {
-                String idA = atomContainerA.getID();
-                String idB = atomContainerB.getID();
-                String message = String.format(
-                        "%s has null stereo for atom %d while " +
-                        "%s has non-null stereo for atom %d", 
-                        idA, indexA, idB, indexB);
-                throw new StereoMatchException(message); 
+                resultMap.put(indexA, ComparisonResult.FIRST_NULL_SECOND_OK);
             } else if (elementA != null && elementB == null) {
-                String idA = atomContainerA.getID();
-                String idB = atomContainerB.getID();
-                String message = String.format(
-                        "%s has non-null stereo for atom %d while ", 
-                        "%s has null stereo for atom %d" +
-                        idA, indexA, idB, indexB);
-                throw new StereoMatchException(message); 
+                resultMap.put(indexA, ComparisonResult.FIRST_OK_SECOND_NULL); 
             } else {
                 CIP_CHIRALITY chiralA = getChirality2D(elementA, atomContainerA);
                 CIP_CHIRALITY chiralB = getChirality2D(elementB, atomContainerB);
                 if (chiralA == CIP_CHIRALITY.NONE && chiralB == CIP_CHIRALITY.NONE) {
-                    continue;
+                    resultMap.put(indexA, ComparisonResult.NEITHER_CHIRAL);
                 } else if (chiralA == CIP_CHIRALITY.NONE && chiralB != CIP_CHIRALITY.NONE) {
-                    
+                    resultMap.put(indexA, ComparisonResult.FIRST_NONE_SECOND_OK);
+                } else if (chiralA == CIP_CHIRALITY.NONE && chiralB != CIP_CHIRALITY.NONE) {
+                    resultMap.put(indexA, ComparisonResult.FIRST_OK_SECOND_NONE);
+                } else {
+                    if (chiralA == chiralB) {
+                        resultMap.put(indexA, ComparisonResult.CHIRAL_MATCH);
+                    } else {
+                        resultMap.put(indexA, ComparisonResult.CHIRAL_MISMATCH);
+                    }
                 }
             }
         }
         
-        return true;
+        return resultMap;
     }
     
     public static CIP_CHIRALITY getChirality2D(
