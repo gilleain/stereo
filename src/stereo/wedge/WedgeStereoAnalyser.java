@@ -2,6 +2,7 @@ package stereo.wedge;
 
 import java.util.List;
 
+import org.openscience.cdk.exception.CDKException;
 import org.openscience.cdk.geometry.cip.CIPTool;
 import org.openscience.cdk.geometry.cip.ILigand;
 import org.openscience.cdk.geometry.cip.VisitedAtoms;
@@ -10,6 +11,7 @@ import org.openscience.cdk.interfaces.IAtom;
 import org.openscience.cdk.interfaces.IAtomContainer;
 import org.openscience.cdk.interfaces.IStereoElement;
 import org.openscience.cdk.interfaces.ITetrahedralChirality;
+import org.openscience.cdk.tools.SaturationChecker;
 
 /**
  * Analyse the stereo wedges around an atom, to determine if they are correct.
@@ -73,15 +75,22 @@ public class WedgeStereoAnalyser {
         if (numberOfNeighbours == 4) {
             hasImplicitHydrogen = false;
         } else if (numberOfNeighbours == 3) {
-            for (IAtom neighbour : neighbours) {
-                if (neighbour.getSymbol().equals("H")) {
-                    if (hasImplicitHydrogen) {  
-                        // already found one, so have two
-                        return false;
-                    } else {
+            Integer implicitCount = atom.getImplicitHydrogenCount(); 
+            if (implicitCount != null && implicitCount == 1) {
+                hasImplicitHydrogen = true;
+            } else {
+                SaturationChecker checker = new SaturationChecker();
+                try {
+                    if (checker.calculateNumberOfImplicitHydrogens(
+                            atom, atomContainer) == 1) {
                         hasImplicitHydrogen = true;
                     }
+                } catch (CDKException e) {
+                    e.printStackTrace();
                 }
+            }
+            if (!hasImplicitHydrogen) {
+                return false;
             }
         } else if (numberOfNeighbours > 4) {
             return false;   // not tetrahedral, anyway
@@ -110,7 +119,7 @@ public class WedgeStereoAnalyser {
         switch (cipChirality) {
             case NONE : return WedgeStereoAnalysisResult.NONE;
             case R : return WedgeStereoAnalysisResult.CHIRAL_R;
-            case S : return WedgeStereoAnalysisResult.CHIRAL_R;
+            case S : return WedgeStereoAnalysisResult.CHIRAL_S;
             default: return WedgeStereoAnalysisResult.NONE;
         }
     }

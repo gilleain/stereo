@@ -44,7 +44,9 @@ import org.openscience.cdk.renderer.generators.IGenerator;
 import org.openscience.cdk.renderer.visitor.AWTDrawVisitor;
 import org.openscience.cdk.tools.periodictable.PeriodicTable;
 import org.openscience.reactionblast.graphics.direct.DirectMoleculeDrawer;
+import org.openscience.reactionblast.graphics.direct.DirectReactionDrawer;
 import org.openscience.reactionblast.graphics.direct.Params;
+import org.openscience.reactionblast.graphics.direct.layout.LeftToRightReactionLayout;
 
 public class BaseTest {
 
@@ -61,6 +63,21 @@ public class BaseTest {
             }
         }
         return true;
+    }
+    
+    public void drawReaction(IReaction reaction, String outputPath, int w, int h) throws IOException {
+        Params params = new Params();
+        params.drawMappings = false;
+        params.highlightSubgraphs = true;
+        params.drawSubgraphBoxes = true;
+        params.drawAromaticCircles = false;
+        params.drawAtomID = true;
+        LeftToRightReactionLayout layout = new LeftToRightReactionLayout();
+        layout.setParams(params);
+        layout.shouldInvert = false;
+        DirectReactionDrawer reactionDrawer = new DirectReactionDrawer(params, layout);
+        Image image = reactionDrawer.drawReaction(reaction, w, h);
+        ImageIO.write((RenderedImage) image, "PNG", new File(outputPath));
     }
 
     public IMolecule getMolecule(String filename) throws FileNotFoundException, CDKException {

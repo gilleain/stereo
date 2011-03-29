@@ -6,6 +6,10 @@ import java.util.Map;
 
 import org.openscience.cdk.interfaces.IAtom;
 import org.openscience.cdk.interfaces.IAtomContainer;
+import org.openscience.cdk.interfaces.IMapping;
+import org.openscience.cdk.interfaces.IMoleculeSet;
+import org.openscience.cdk.interfaces.IReaction;
+import org.openscience.cdk.tools.manipulator.MoleculeSetManipulator;
 
 import stereo.wedge.WedgeStereoAnalyser;
 import stereo.wedge.WedgeStereoAnalysisResult;
@@ -19,6 +23,23 @@ import stereo.wedge.WedgeStereoLifter;
  *
  */
 public class WedgeStereoComparisonTool {
+    
+    public static List<WedgeStereoComparisonResult> compare(IReaction reaction) {
+        List<WedgeStereoComparisonResult> results = 
+            new ArrayList<WedgeStereoComparisonResult>();
+        
+        WedgeStereoLifter lifter = new WedgeStereoLifter();
+        IMoleculeSet reactants = reaction.getReactants();
+        IMoleculeSet products = reaction.getProducts();
+        for (IMapping mapping : reaction.mappings()) {
+            IAtom atomA = (IAtom) mapping.getChemObject(0);
+            IAtom atomB = (IAtom) mapping.getChemObject(1);
+            IAtomContainer atomContainerA = MoleculeSetManipulator.getRelevantAtomContainer(reactants, atomA);
+            IAtomContainer atomContainerB = MoleculeSetManipulator.getRelevantAtomContainer(products, atomB);
+            results.add(compare(atomA, atomContainerA, atomB, atomContainerB, lifter));
+        }
+        return results;
+    }
     
     /**
      * Compare a (mapped) pair of atom containers to check that they have

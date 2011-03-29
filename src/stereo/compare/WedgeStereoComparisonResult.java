@@ -45,4 +45,9 @@ public class WedgeStereoComparisonResult {
     public WedgeStereoAnalysisResult getResultForSecond() {
         return resultForSecond;
     }
+    
+    public String toString() {
+        return firstAtom.getID() + " : " + resultForFirst + ", "
+             + secondAtom.getID() + " : " + resultForSecond;
+    }
 }
