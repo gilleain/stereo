@@ -1,4 +1,4 @@
-package test;
+package test.stereo.wedge;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -14,10 +14,11 @@ import org.openscience.cdk.interfaces.IBond.Stereo;
 import org.openscience.cdk.interfaces.IMolecule;
 import org.openscience.cdk.io.MDLV2000Writer;
 
-import stereo.wedge.WedgeStereoComparisonTool;
+import stereo.wedge.WedgeStereoAnalyser;
 import stereo.wedge.WedgeStereoLifter;
+import test.BaseTest;
 
-public class WedgeStereoComparisonToolTest extends BaseTest {
+public class WedgeStereoAnalyserTest extends BaseTest {
     
     private WedgeStereoLifter lifter;
     
@@ -106,9 +107,8 @@ public class WedgeStereoComparisonToolTest extends BaseTest {
     public void up_none_up_Test() {
         IAtomContainer tetra = getTetra(Shape.CROSS, Stereo.NONE, Stereo.UP, Stereo.NONE, Stereo.UP);
         
-        new WedgeStereoComparisonTool();
         CIP_CHIRALITY chirality = 
-            WedgeStereoComparisonTool.getChirality2D(
+            WedgeStereoAnalyser.getChirality2D(
                     lifter, tetra.getAtom(0), tetra);
         System.out.println(chirality);
     }
@@ -117,9 +117,8 @@ public class WedgeStereoComparisonToolTest extends BaseTest {
     @Test
     public void down_none_up_Test() {
         IAtomContainer tetra = getTetra(Shape.CROSS, Stereo.NONE, Stereo.DOWN, Stereo.NONE, Stereo.UP);
-        new WedgeStereoComparisonTool();
         CIP_CHIRALITY chirality = 
-            WedgeStereoComparisonTool.getChirality2D(
+            WedgeStereoAnalyser.getChirality2D(
                     lifter, tetra.getAtom(0), tetra);
         System.out.println(chirality);
     }
@@ -127,9 +126,8 @@ public class WedgeStereoComparisonToolTest extends BaseTest {
     @Test
     public void up_down_none_Test() {
         IAtomContainer tetra = getTetra(Shape.CROSS, Stereo.NONE, Stereo.UP, Stereo.DOWN, Stereo.NONE);
-        new WedgeStereoComparisonTool();
         CIP_CHIRALITY chirality = 
-            WedgeStereoComparisonTool.getChirality2D(
+            WedgeStereoAnalyser.getChirality2D(
                     lifter, tetra.getAtom(0), tetra);
         System.out.println(chirality);
     }
@@ -137,9 +135,8 @@ public class WedgeStereoComparisonToolTest extends BaseTest {
     @Test
     public void up_none_down_Test() {
         IAtomContainer tetra = getTetra(Shape.CROSS, Stereo.NONE, Stereo.UP, Stereo.NONE, Stereo.DOWN);
-        new WedgeStereoComparisonTool();
         CIP_CHIRALITY chirality = 
-            WedgeStereoComparisonTool.getChirality2D(
+            WedgeStereoAnalyser.getChirality2D(
                     lifter, tetra.getAtom(0), tetra);
         System.out.println(chirality);
     }
