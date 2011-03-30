@@ -16,7 +16,7 @@ import test.BaseTest;
 
 public class KEGGMolTests extends BaseTest {
     
-    public static final String DATA_DIR = "data/mols/";
+    public static final String DATA_DIR = "data/mols/kegg/";
     
     public void basicTest(String compoundID) throws FileNotFoundException, CDKException {
         IMolecule mol = getMolecule(DATA_DIR + compoundID + ".mol");

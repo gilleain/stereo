@@ -47,7 +47,19 @@ public class WedgeStereoComparisonResult {
     }
     
     public String toString() {
-        return firstAtom.getID() + " : " + resultForFirst + ", "
-             + secondAtom.getID() + " : " + resultForSecond;
+        String firstID;
+        if (firstAtom.getID() == null) {
+            firstID = String.valueOf(firstAtomContainer.getAtomNumber(firstAtom));
+        } else {
+            firstID = firstAtom.getID();
+        }
+        String secondID;
+        if (secondAtom.getID() == null) {
+            secondID = String.valueOf(secondAtomContainer.getAtomNumber(secondAtom));
+        } else {
+            secondID = secondAtom.getID();
+        }
+        return firstID + "\t:\t" + resultForFirst + "\t\t"
+            + secondID + "\t:\t" + resultForSecond;
     }
 }

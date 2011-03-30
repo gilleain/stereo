@@ -1,15 +1,12 @@
 package test.stereo.wedge;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 
 
 import org.junit.Test;
 import org.openscience.cdk.exception.CDKException;
 import org.openscience.cdk.interfaces.IAtom;
 import org.openscience.cdk.interfaces.IAtomContainer;
-import org.openscience.cdk.interfaces.IBond;
 import org.openscience.cdk.interfaces.IMapping;
 import org.openscience.cdk.interfaces.IReaction;
 import org.openscience.cdk.smsd.labelling.AtomContainerPrinter;
@@ -21,8 +18,8 @@ import test.BaseTest;
 
 public class WedgeComparisonToolTest extends BaseTest {
     
-    public static final int w = 900;
-    public static final int h = 400;
+    public static final int w = 1200;
+    public static final int h = 600;
     
     public void testReaction(IReaction reaction, String name) throws IOException {
         AtomContainerPrinter acp = new AtomContainerPrinter();
