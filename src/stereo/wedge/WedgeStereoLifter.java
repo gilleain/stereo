@@ -68,7 +68,11 @@ public class WedgeStereoLifter {
         
         WedgeRule rule = getRule(stereos);
         if (rule != null) {
-            return rule.execute(atom, atomContainer, angleMap);
+            IStereoElement element = rule.execute(atom, atomContainer, angleMap);
+            if (element != null) {
+                atomContainer.addStereoElement(element);
+            }
+            return element;
         } else {
             return null;
         }

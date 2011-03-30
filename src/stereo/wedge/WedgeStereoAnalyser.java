@@ -1,5 +1,6 @@
 package stereo.wedge;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.openscience.cdk.exception.CDKException;
@@ -20,6 +21,19 @@ import org.openscience.cdk.tools.SaturationChecker;
  *
  */
 public class WedgeStereoAnalyser {
+    
+    public static List<WedgeStereoAnalysisResult> getResults(IAtomContainer atomContainer) {
+        WedgeStereoLifter lifter = new WedgeStereoLifter();
+        return getResults(atomContainer, lifter);
+    }
+    
+    public static List<WedgeStereoAnalysisResult> getResults(IAtomContainer atomContainer, WedgeStereoLifter lifter) {
+        List<WedgeStereoAnalysisResult> results = new ArrayList<WedgeStereoAnalysisResult>();
+        for (IAtom atom : atomContainer.atoms()) {
+            results.add(getResult(atom, atomContainer, lifter));
+        }
+        return results;
+    }
     
     public static WedgeStereoAnalysisResult getResult(IAtom atom, IAtomContainer atomContainer, WedgeStereoLifter lifter) {
         boolean isPotentialStereoCenter = hasPotentialStereoCenter(atom, atomContainer);

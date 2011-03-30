@@ -38,6 +38,7 @@ public class SingleUpWedgeRule extends WedgeRule {
         }
         IChemObjectBuilder builder = centralAtom.getBuilder(); 
         IAtom explicitHydrogen = builder.newInstance(IAtom.class, "H");
+        atomContainer.addAtom(explicitHydrogen);
         atomContainer.addBond(builder.newInstance(IBond.class, centralAtom, explicitHydrogen));
         ligandAtoms[3] = explicitHydrogen;
         ITetrahedralChirality.Stereo chirality = ITetrahedralChirality.Stereo.CLOCKWISE; 
