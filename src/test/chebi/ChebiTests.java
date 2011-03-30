@@ -8,15 +8,19 @@ import java.util.List;
 
 import org.junit.Test;
 import org.openscience.cdk.Atom;
+import org.openscience.cdk.DefaultChemObjectBuilder;
 import org.openscience.cdk.Molecule;
 import org.openscience.cdk.exception.CDKException;
 import org.openscience.cdk.geometry.cip.CIPTool;
 import org.openscience.cdk.interfaces.IAtom;
 import org.openscience.cdk.interfaces.IBond;
 import org.openscience.cdk.interfaces.IMolecule;
+import org.openscience.cdk.interfaces.IStereoElement;
+import org.openscience.cdk.interfaces.ITetrahedralChirality;
 import org.openscience.cdk.interfaces.ITetrahedralChirality.Stereo;
 import org.openscience.cdk.layout.StructureDiagramGenerator;
 import org.openscience.cdk.smiles.SmilesGenerator;
+import org.openscience.cdk.smiles.SmilesParser;
 import org.openscience.cdk.smsd.labelling.AtomContainerPrinter;
 
 import stereo.wedge.WedgeStereoAnalyser;
@@ -73,32 +77,47 @@ public class ChebiTests extends BaseTest {
     public void umbelliferoseTest() throws CDKException, IOException {
         AtomContainerPrinter acp = new AtomContainerPrinter();
         IMolecule umbelliferose = get("9859");
-        drawDirect(umbelliferose, "img/umbelliferose.png");
         int atomIndex = 0;
         for (WedgeStereoAnalysisResult result : WedgeStereoAnalyser.getResults(umbelliferose)) {
             System.out.println(atomIndex + " " + result);
             atomIndex++;
         }
         System.out.println(acp.toString(umbelliferose));
-        List<IBond> bonds = new ArrayList<IBond>();
-        for (IBond bond : umbelliferose.bonds()) {
-            IAtom atom0 = bond.getAtom(0);
-            IAtom atom1 = bond.getAtom(1);
-            if (umbelliferose.contains(atom0) && umbelliferose.contains(atom1)) {
-                bonds.add(bond);
-            } else {
-                System.out.println(atom0.getClass().getCanonicalName() 
-                        + " " + atom1.getClass().getCanonicalName());
-            }
+        StructureDiagramGenerator sdg = new StructureDiagramGenerator();
+        sdg.setMolecule(umbelliferose, false);
+        try {
+            sdg.generateCoordinates();
+        } catch (Exception e) {
+            
         }
-        umbelliferose.setBonds(bonds.toArray(new IBond[bonds.size()]));
+        drawDirect(umbelliferose, "img/umbelliferose.png");
         System.out.println(acp.toString(umbelliferose));
         SmilesGenerator smilesWriter = new SmilesGenerator();
-        boolean[] doubleBondConfig = new boolean[bonds.size()];
+        boolean[] doubleBondConfig = new boolean[umbelliferose.getBondCount()];
         Arrays.fill(doubleBondConfig, false);
         String smiles = smilesWriter.createChiralSMILES(
                 umbelliferose, doubleBondConfig);
         System.out.println(smiles);
+        SmilesParser parser = new SmilesParser(DefaultChemObjectBuilder.getInstance());
+        IMolecule mol = parser.parseSmiles(smiles);
+        for (IStereoElement stereoElement : mol.stereoElements()) {
+            System.out.println(stereoElement);
+        }
+    }
+    
+    @Test
+    public void umbelliferoseSmilesTest() throws CDKException, IOException {
+        String smiles = "OC[C@H]1O[C@H](O[C@@H]2[C@@H](O)[C@@H](O)[C@@H](CO)O" +
+        "[C@@H]2O[C@]2(CO)O[C@H](CO)[C@@H](O)[C@@H]2O)[C@H](O)[C@@H](O)[C@H]1O";
+        SmilesParser parser = new SmilesParser(DefaultChemObjectBuilder.getInstance());
+        IMolecule mol = parser.parseSmiles(smiles);
+        for (IStereoElement stereoElement : mol.stereoElements()) {
+            if (stereoElement instanceof ITetrahedralChirality) {
+                ITetrahedralChirality chir = (ITetrahedralChirality) stereoElement;
+                IAtom chirAtom = chir.getChiralAtom();
+                System.out.println(chirAtom.getSymbol() + mol.getAtomNumber(chirAtom) + "{" + chir.getStereo() + "}");
+            }
+        }
     }
 
 }
