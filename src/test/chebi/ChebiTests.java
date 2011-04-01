@@ -2,75 +2,82 @@ package test.chebi;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.junit.Test;
-import org.openscience.cdk.Atom;
 import org.openscience.cdk.DefaultChemObjectBuilder;
-import org.openscience.cdk.Molecule;
 import org.openscience.cdk.exception.CDKException;
-import org.openscience.cdk.geometry.cip.CIPTool;
 import org.openscience.cdk.interfaces.IAtom;
-import org.openscience.cdk.interfaces.IBond;
+import org.openscience.cdk.interfaces.IAtomContainer;
 import org.openscience.cdk.interfaces.IMolecule;
 import org.openscience.cdk.interfaces.IStereoElement;
 import org.openscience.cdk.interfaces.ITetrahedralChirality;
-import org.openscience.cdk.interfaces.ITetrahedralChirality.Stereo;
 import org.openscience.cdk.layout.StructureDiagramGenerator;
 import org.openscience.cdk.smiles.SmilesGenerator;
 import org.openscience.cdk.smiles.SmilesParser;
+import org.openscience.cdk.smsd.Isomorphism;
+import org.openscience.cdk.smsd.interfaces.Algorithm;
 import org.openscience.cdk.smsd.labelling.AtomContainerPrinter;
 
 import stereo.wedge.WedgeStereoAnalyser;
 import stereo.wedge.WedgeStereoAnalysisResult;
-import stereo.wedge.WedgeStereoLifter;
 import test.BaseTest;
 
 public class ChebiTests extends BaseTest {
     
     public static final String DATA_DIR = "data/mols/chebi/";
     
+    // smiles from chebi
+    public static final String smilesFor9859 =
+        "OC[C@H]1O[C@H](O[C@@H]2[C@@H](O)[C@@H](O)[C@@H](CO)O" +
+        "[C@@H]2O[C@]2(CO)O[C@H](CO)[C@@H](O)[C@@H]2O)[C@H](O)[C@@H](O)[C@H]1O";
+    
     public IMolecule get(String chebiID) throws FileNotFoundException, CDKException {
         return getMolecule(DATA_DIR + "ChEBI_" + chebiID + ".mol");
     }
     
     @Test
-    public void tmpCipTest() {
-        IMolecule molecule = new Molecule();
-        molecule.addAtom(new Atom("C"));
-        molecule.addAtom(new Atom("C"));
-        molecule.addAtom(new Atom("C"));
-        molecule.addAtom(new Atom("C"));
-        molecule.addAtom(new Atom("C"));
-        molecule.addAtom(new Atom("C"));
-        molecule.addAtom(new Atom("C"));
-        molecule.addAtom(new Atom("C"));
-        molecule.addAtom(new Atom("C"));
-        molecule.addAtom(new Atom("C"));
-        molecule.addBond(0, 1, IBond.Order.SINGLE, IBond.Stereo.UP);
-        molecule.addBond(0, 2, IBond.Order.SINGLE);
-        molecule.addBond(0, 3, IBond.Order.SINGLE);
-        molecule.addBond(1, 4, IBond.Order.SINGLE);
-        molecule.addBond(2, 5, IBond.Order.SINGLE);
-        molecule.addBond(2, 6, IBond.Order.SINGLE);
-        molecule.addBond(3, 7, IBond.Order.SINGLE);
-        molecule.addBond(3, 8, IBond.Order.SINGLE);
-        molecule.addBond(3, 9, IBond.Order.SINGLE);
-        StructureDiagramGenerator sdg = new StructureDiagramGenerator();
-        sdg.setMolecule(molecule, false);
-        try {
-            sdg.generateCoordinates();
-        } catch (Exception e) {
-            
+    public void compareStereoElements() throws FileNotFoundException, CDKException {
+        IMolecule molFromFile = get("9859");
+        // also sets the stereo elements as a side-effect
+        WedgeStereoAnalyser.getResults(molFromFile);
+        Map<IAtom, ITetrahedralChirality> fromFileChiralMap = getStereoMap(molFromFile);
+        
+        SmilesParser parser = new SmilesParser(DefaultChemObjectBuilder.getInstance());
+        IMolecule molFromSmiles = parser.parseSmiles(smilesFor9859);
+        Map<IAtom, ITetrahedralChirality> fromSmilesChiralMap = getStereoMap(molFromSmiles);
+        
+        Isomorphism isomorphism = new Isomorphism(Algorithm.DEFAULT, false);
+        isomorphism.init(molFromFile, molFromSmiles, false, false);
+        Map<IAtom, IAtom> atomAtomMapping = isomorphism.getFirstAtomMapping();
+        
+        for (IAtom fromFileAtom : fromFileChiralMap.keySet()) {
+            ITetrahedralChirality fromFileChirality = fromFileChiralMap.get(fromFileAtom);
+            IAtom fromSmilesAtom = atomAtomMapping.get(fromFileAtom);
+            ITetrahedralChirality fromSmilesChirality = fromSmilesChiralMap.get(fromSmilesAtom);
+            if (fromFileChirality.getStereo() == fromSmilesChirality.getStereo()) {
+                System.out.println("MATCH");
+            } else {
+                System.out.println("MISMATCH " 
+                        + molFromFile.getAtomNumber(fromFileAtom)
+                        + " : "
+                        + molFromSmiles.getAtomNumber(fromSmilesAtom));
+            }
         }
-        AtomContainerPrinter acp = new AtomContainerPrinter();
-        System.out.println(acp.toString(molecule));
-//        CIPTool.defineLigancyFourChirality(molecule, 0, 1, 2, 3, -1, Stereo.CLOCKWISE);
-        WedgeStereoLifter lifter = new WedgeStereoLifter();
-        lifter.lift(molecule.getAtom(0), molecule);
-        System.out.println(acp.toString(molecule));
+    }
+    
+    public Map<IAtom, ITetrahedralChirality> getStereoMap(IAtomContainer atomContainer) {
+        Map<IAtom, ITetrahedralChirality> stereoMap = 
+            new HashMap<IAtom, ITetrahedralChirality>();
+        for (IStereoElement stereoElement : atomContainer.stereoElements()) {
+            if (stereoElement instanceof ITetrahedralChirality) {
+                ITetrahedralChirality itc = (ITetrahedralChirality) stereoElement;
+                stereoMap.put(itc.getChiralAtom(), itc);
+            }
+        }
+        return stereoMap;
     }
     
     @Test
@@ -83,6 +90,8 @@ public class ChebiTests extends BaseTest {
             atomIndex++;
         }
         System.out.println(acp.toString(umbelliferose));
+        
+        // XXX : only need to do this for the added H's - could they be laid out?
         StructureDiagramGenerator sdg = new StructureDiagramGenerator();
         sdg.setMolecule(umbelliferose, false);
         try {
@@ -107,10 +116,8 @@ public class ChebiTests extends BaseTest {
     
     @Test
     public void umbelliferoseSmilesTest() throws CDKException, IOException {
-        String smiles = "OC[C@H]1O[C@H](O[C@@H]2[C@@H](O)[C@@H](O)[C@@H](CO)O" +
-        "[C@@H]2O[C@]2(CO)O[C@H](CO)[C@@H](O)[C@@H]2O)[C@H](O)[C@@H](O)[C@H]1O";
         SmilesParser parser = new SmilesParser(DefaultChemObjectBuilder.getInstance());
-        IMolecule mol = parser.parseSmiles(smiles);
+        IMolecule mol = parser.parseSmiles(smilesFor9859);
         for (IStereoElement stereoElement : mol.stereoElements()) {
             if (stereoElement instanceof ITetrahedralChirality) {
                 ITetrahedralChirality chir = (ITetrahedralChirality) stereoElement;
