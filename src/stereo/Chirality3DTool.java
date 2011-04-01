@@ -21,9 +21,31 @@ import org.openscience.cdk.stereo.TetrahedralChirality;
  *
  */
 public class Chirality3DTool {
-
+    /**
+     * Get R/S chirality assignments for an atomcontainer that should have
+     * 3D coordinates as Point3d set in the atoms. Note that assignments of
+     * CIP_CHIRALITY.NONE are not returned by default.
+     * 
+     * @param atomContainer the atom container to perform assignments on
+     * @return a map of chiral atoms to assignments
+     */
     public static Map<IAtom, CIP_CHIRALITY> getTetrahedralChiralities(
-            IAtomContainer atomContainer) {
+        IAtomContainer atomContainer) {
+        return getTetrahedralChiralities(atomContainer, false);
+    }
+
+    /**
+     * Get R/S chirality assignments for an atomcontainer that should have
+     * 3D coordinates as Point3d set in the atoms. If getNoneAssignments is 
+     * set to true, atoms with 4 neighbours that are not chiral will be mapped
+     * to CIP_CHIRALITY.NONE.
+     * 
+     * @param atomContainer the atom container to perform assignments on
+     * @param getNoneAssigments if true, map non-chiral tetrahedral centers to NONE
+     * @return a map of chiral atoms to assignments
+     */
+    public static Map<IAtom, CIP_CHIRALITY> getTetrahedralChiralities(
+                IAtomContainer atomContainer, boolean getNoneAssigments) {
         Map<IAtom, CIP_CHIRALITY> chiralMap = new HashMap<IAtom, CIP_CHIRALITY>();
         for (IAtom atom : atomContainer.atoms()) {
             List<IAtom> neighbours = atomContainer.getConnectedAtomsList(atom);
